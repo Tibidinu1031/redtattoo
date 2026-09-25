@@ -1,0 +1,42 @@
+{
+  "studio": "RED TATTOO by Cristi Nitu",
+  "requestedCount": 20,
+  "verifiedTattooCount": 0,
+  "downloadedTattooCount": 0,
+  "scope": "Only real tattoo works traceable to the two official studio social pages.",
+  "officialSources": [
+    "https://www.instagram.com/red_tattoo_by_cristi_nitu/",
+    "https://www.facebook.com/p/Red-Tattoo-by-Cristi-Nitu-100063556569667/"
+  ],
+  "assets": [],
+  "attempts": [
+    {
+      "url": "https://www.instagram.com/red_tattoo_by_cristi_nitu/",
+      "result": "Public HTTP 200; correct studio profile metadata, but initial HTML exposes no tattoo post image data or post permalinks.",
+      "evidenceFile": "instagram-public-page.html"
+    },
+    {
+      "url": "https://www.instagram.com/api/v1/users/web_profile_info/?username=red_tattoo_by_cristi_nitu",
+      "result": "Unauthenticated public request returned HTTP 429 Too Many Requests; no further requests made to that endpoint."
+    },
+    {
+      "url": "https://www.facebook.com/p/Red-Tattoo-by-Cristi-Nitu-100063556569667/",
+      "result": "Public HTTP 200; studio identity and profile picture metadata only, no actual tattoo posts/images exposed in returned HTML. Web reader separately returned a temporary-block page.",
+      "evidenceFile": "facebook-public-page.html"
+    },
+    {
+      "url": "https://www.facebook.com/100063556569667/photos/",
+      "result": "Public HTTP 200; no actual tattoo photo URLs in returned HTML.",
+      "evidenceFile": "facebook-public-photos.html"
+    },
+    {
+      "method": "Web search and image search",
+      "result": "No verifiable official studio post results. Unrelated artists and third-party publications excluded."
+    },
+    {
+      "method": "Unified CUA public browser",
+      "result": "Browser entry unavailable: node_repl kernel exited; Windows sandbox failed with helper_unknown_error: apply deny-read ACLs."
+    }
+  ],
+  "nextStep": "Provide actual tattoo photo files from the studio, or restore a working browser session in which official posts can be publicly viewed. No generated images, stock images, third-party images, or other artists works were accepted."
+}
