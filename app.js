@@ -1,42 +1,41 @@
-const menuButton = document.querySelector('.menu-toggle');
-const mobileMenu = document.querySelector('#mobile-menu');
-function closeMenu() { menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', 'Deschide meniul'); mobileMenu.hidden = true; }
-menuButton.addEventListener('click', () => { const open = menuButton.getAttribute('aria-expanded') !== 'true'; menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Închide meniul' : 'Deschide meniul'); mobileMenu.hidden = !open; });
-mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-document.addEventListener('keydown', event => { if (event.key === 'Escape' && !mobileMenu.hidden) { closeMenu(); menuButton.focus(); } });
-
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const motionButton = document.querySelector('.motion-toggle');
-let motionPaused = reduceMotion.matches;
-try { motionPaused ||= localStorage.getItem('red-tattoo-pause-motion') === 'true'; } catch {}
-function updateMotion() {
-  document.body.classList.toggle('motion-paused', motionPaused);
-  motionButton.setAttribute('aria-pressed', String(motionPaused));
-  motionButton.setAttribute('aria-label', motionPaused ? 'Pornește animațiile continue' : 'Oprește animațiile continue');
-  motionButton.firstElementChild.textContent = motionPaused ? '▷' : 'Ⅱ';
+const menuButton = $('.menu-toggle');
+const mobileMenu = $('#mobile-menu');
+function closeMenu() {
+  menuButton.setAttribute('aria-expanded', 'false');
+  menuButton.setAttribute('aria-label', 'Deschide meniul');
+  mobileMenu.hidden = true;
 }
-updateMotion();
-motionButton.addEventListener('click', () => {
-  motionPaused = !motionPaused;
-  updateMotion();
-  try { localStorage.setItem('red-tattoo-pause-motion', String(motionPaused)); } catch {}
+menuButton.addEventListener('click', () => {
+  const open = menuButton.getAttribute('aria-expanded') !== 'true';
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.setAttribute('aria-label', open ? 'Închide meniul' : 'Deschide meniul');
+  mobileMenu.hidden = !open;
 });
-reduceMotion.addEventListener('change', event => {
-  motionPaused = event.matches;
-  updateMotion();
-  if (event.matches) document.documentElement.classList.remove('js-motion');
+$$('a', mobileMenu).forEach(link => link.addEventListener('click', closeMenu));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !mobileMenu.hidden) { closeMenu(); menuButton.focus(); }
 });
+window.matchMedia('(min-width: 761px)').addEventListener('change', event => { if (event.matches) closeMenu(); });
+
+// Reveal once; content remains available when motion is reduced or JS is absent.
 if (!reduceMotion.matches && 'IntersectionObserver' in window) {
-  document.documentElement.classList.add('js-motion');
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) if (entry.isIntersecting) {
       entry.target.classList.add('is-visible');
       observer.unobserve(entry.target);
     }
-  }, {threshold:0.08, rootMargin:'0px 0px -20px 0px'});
-  document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
+  }, { threshold: 0.08 });
+  $$('.reveal').forEach(element => observer.observe(element));
+  document.documentElement.classList.add('js-motion');
 }
-const tabs = Array.from(document.querySelectorAll('.process-tab'));
+reduceMotion.addEventListener('change', event => {
+  if (event.matches) document.documentElement.classList.remove('js-motion');
+});
+
+const tabs = $$('.process-tab');
 function activateTab(tab, focus = false) {
   for (const item of tabs) {
     const active = item === tab;
@@ -58,29 +57,267 @@ tabs.forEach((tab, index) => {
     if (next !== undefined) { event.preventDefault(); activateTab(tabs[next], true); }
   });
 });
-const progress = document.querySelector('.scroll-progress');
+
+const progress = $('.scroll-progress');
 let scheduled = false;
 function updateScroll() {
   const max = document.documentElement.scrollHeight - innerHeight;
   progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
   scheduled = false;
 }
-window.addEventListener('scroll', () => { if (!scheduled) { scheduled = true; requestAnimationFrame(updateScroll); } }, {passive:true});
+window.addEventListener('scroll', () => {
+  if (!scheduled) { scheduled = true; requestAnimationFrame(updateScroll); }
+}, { passive: true });
 window.addEventListener('resize', updateScroll);
-window.matchMedia('(min-width: 641px)').addEventListener('change', event => { if(event.matches) closeMenu(); });
 updateScroll();
-document.getElementById('year').textContent = new Date().getFullYear();
+$('#year').textContent = new Date().getFullYear();
 
-// Subtle pointer response on desktop; keyboard and reduced-motion paths stay static.
-if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  document.querySelectorAll('.button-red').forEach(button => {
-    button.addEventListener('pointermove', event => {
-      if (reduceMotion.matches || motionPaused) return;
-      const rect = button.getBoundingClientRect();
-      const x = (event.clientX - rect.left - rect.width / 2) * 0.06;
-      const y = (event.clientY - rect.top - rect.height / 2) * 0.12;
-      button.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+function initializeGallery() {
+  const photos = Array.isArray(window.RED_TATTOO_GALLERY) ? window.RED_TATTOO_GALLERY : [];
+  const body = $('.gallery-body');
+  const empty = $('.gallery-empty');
+  body.hidden = !photos.length;
+  empty.hidden = !!photos.length;
+  $('.view-switch').hidden = !photos.length;
+  if (!photos.length) return;
+
+  const scene = $('.gallery-scene');
+  const deck = $('.gallery-deck');
+  const grid = $('.gallery-grid');
+  const rail = $('.thumbnail-rail');
+  const dialog = $('.photo-viewer');
+  const viewerImage = $('.viewer-image');
+  const imageWrap = $('.viewer-image-wrap');
+  const zoomButton = $('.viewer-zoom');
+  const live = $('.gallery-live');
+  let current = 0;
+  let view = 'deck';
+  let previousFocus;
+  let zoomed = false;
+  let drag = null;
+  let ignoreClickUntil = 0;
+  let announceTimer;
+  const pad = n => String(n).padStart(2, '0');
+
+  function imageFor(photo, alt, eager = false) {
+    const image = document.createElement('img');
+    image.src = photo.src;
+    image.alt = alt;
+    image.width = photo.width || 900;
+    image.height = photo.height || 1200;
+    image.loading = eager ? 'eager' : 'lazy';
+    image.decoding = 'async';
+    image.draggable = false;
+    return image;
+  }
+
+  const cards = photos.map((photo, index) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'gallery-card';
+    card.dataset.number = pad(index + 1);
+    card.setAttribute('aria-label', photo.title + ', fotografia ' + (index + 1) + ' din ' + photos.length);
+    card.append(imageFor(photo, photo.alt, index < 4 || index > photos.length - 4));
+    card.addEventListener('click', () => {
+      if (performance.now() < ignoreClickUntil) return;
+      if (current === index) openViewer(card);
+      else select(index);
     });
-    button.addEventListener('pointerleave', () => { button.style.transform = ''; });
+    deck.append(card);
+    return card;
   });
+  const thumbnails = photos.map((photo, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'thumbnail';
+    button.setAttribute('aria-label', 'Fotografia ' + (index + 1) + ': ' + photo.title);
+    button.append(imageFor(photo, ''));
+    button.addEventListener('click', () => select(index));
+    rail.append(button);
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'grid-photo';
+    tile.setAttribute('aria-label', 'Mărește: ' + photo.title);
+    tile.append(imageFor(photo, photo.alt));
+    const caption = document.createElement('span');
+    caption.textContent = pad(index + 1) + ' / ' + photo.title;
+    tile.append(caption);
+    tile.addEventListener('click', () => { select(index); openViewer(tile); });
+    grid.append(tile);
+    return button;
+  });
+
+  function offset(index) {
+    let distance = (index - current + photos.length) % photos.length;
+    if (distance > photos.length / 2) distance -= photos.length;
+    return distance;
+  }
+  function renderDeck() {
+    const compact = scene.clientWidth < 541;
+    const spacing = compact ? 100 : scene.clientWidth < 900 ? 150 : 205;
+    cards.forEach((card, index) => {
+      const d = offset(index);
+      const a = Math.abs(d);
+      const visible = a <= 3;
+      const selected = d === 0;
+      card.style.setProperty('--x', d * spacing + 'px');
+      card.style.setProperty('--z', -a * (compact ? 150 : 160) + 'px');
+      card.style.setProperty('--ry', (selected ? -7 : -Math.sign(d) * 39) + 'deg');
+      card.style.setProperty('--rz', (selected ? -3 : -Math.sign(d) * 5) + 'deg');
+      card.style.setProperty('--opacity', visible ? 1 : 0);
+      card.style.setProperty('--order', String(10 - a));
+      card.style.pointerEvents = visible ? 'auto' : 'none';
+      card.tabIndex = selected ? 0 : -1;
+      card.setAttribute('aria-hidden', String(!visible));
+      card.setAttribute('aria-current', String(selected));
+      card.classList.toggle('is-current', selected);
+      if (visible) $('img', card).loading = 'eager';
+    });
+  }
+  function setZoom(value) {
+    zoomed = value;
+    imageWrap.classList.toggle('is-zoomed', zoomed);
+    zoomButton.setAttribute('aria-pressed', String(zoomed));
+    zoomButton.setAttribute('aria-label', zoomed ? 'Revino la fotografia întreagă' : 'Mărește fotografia');
+    zoomButton.textContent = zoomed ? 'Zoom −' : 'Zoom +';
+    imageWrap.scrollTop = 0;
+    imageWrap.scrollLeft = 0;
+  }
+  function renderViewer() {
+    const photo = photos[current];
+    viewerImage.src = photo.src;
+    viewerImage.alt = photo.alt;
+    $('.viewer-counter').textContent = pad(current + 1) + ' / ' + pad(photos.length);
+    $('#viewer-title').textContent = photo.title;
+    $('.viewer-source').href = photo.source;
+    setZoom(false);
+  }
+  function select(index, announce = true) {
+    current = (index + photos.length) % photos.length;
+    const photo = photos[current];
+    $('.work-counter b').textContent = pad(current + 1);
+    $('.work-counter > span').textContent = pad(photos.length);
+    $('.work-title').textContent = photo.title;
+    $('.work-category').textContent = photo.category;
+    thumbnails.forEach((button, i) => button.setAttribute('aria-pressed', String(i === current)));
+    renderDeck();
+    if (dialog.open) renderViewer();
+    if (announce) {
+      clearTimeout(announceTimer);
+      announceTimer = setTimeout(() => {
+        live.textContent = 'Fotografia ' + (current + 1) + ' din ' + photos.length + ': ' + photo.title;
+      }, 120);
+      const thumb = thumbnails[current];
+      rail.scrollTo({ left: thumb.offsetLeft - rail.offsetLeft - (rail.clientWidth - thumb.clientWidth) / 2, behavior: reduceMotion.matches ? 'instant' : 'smooth' });
+    }
+  }
+  function openViewer(trigger) {
+    previousFocus = trigger || document.activeElement;
+    renderViewer();
+    dialog.showModal();
+    document.body.classList.add('viewer-open');
+    $('.viewer-close').focus({ preventScroll: true });
+  }
+  $('.viewer-close').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => {
+    document.body.classList.remove('viewer-open');
+    setZoom(false);
+    if (previousFocus?.isConnected) {
+      const target = previousFocus.classList.contains('gallery-card') ? cards[current] : previousFocus;
+      target.focus({ preventScroll: true });
+    }
+  });
+  zoomButton.addEventListener('click', () => setZoom(!zoomed));
+  viewerImage.addEventListener('click', () => { if (zoomed) setZoom(false); });
+  $('.open-photo').addEventListener('click', event => openViewer(event.currentTarget));
+  $('.gallery-prev').addEventListener('click', () => select(current - 1));
+  $('.gallery-next').addEventListener('click', () => select(current + 1));
+  $('.viewer-prev').addEventListener('click', () => select(current - 1));
+  $('.viewer-next').addEventListener('click', () => select(current + 1));
+
+  function navigateKey(event) {
+    let next;
+    if (event.key === 'ArrowRight') next = current + 1;
+    if (event.key === 'ArrowLeft') next = current - 1;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = photos.length - 1;
+    if (next !== undefined) {
+      event.preventDefault();
+      const wasCard = document.activeElement.classList.contains('gallery-card');
+      select(next);
+      if (wasCard && !dialog.open) cards[current].focus({ preventScroll: true });
+    }
+    if (event.key === 'Enter' && event.target === scene) { event.preventDefault(); openViewer(scene); }
+  }
+  scene.addEventListener('keydown', navigateKey);
+  dialog.addEventListener('keydown', navigateKey);
+  rail.addEventListener('keydown', event => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+    navigateKey(event);
+    thumbnails[current].focus({ preventScroll: true });
+  });
+
+  // Do not prevent vertical swipes: page scrolling keeps working on phones.
+  scene.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, horizontal: false };
+  });
+  scene.addEventListener('pointermove', event => {
+    if (!drag || drag.id !== event.pointerId) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (!drag.horizontal && Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+    if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
+      drag.horizontal = true;
+      scene.classList.add('is-dragging');
+      if (!scene.hasPointerCapture(event.pointerId)) scene.setPointerCapture(event.pointerId);
+    }
+    drag.dx = dx;
+  });
+  function finishDrag(event) {
+    if (!drag || drag.id !== event.pointerId) return;
+    if (drag.horizontal) {
+      ignoreClickUntil = performance.now() + 350;
+      if (Math.abs(drag.dx) > 42) select(current + (drag.dx < 0 ? 1 : -1));
+    }
+    scene.classList.remove('is-dragging');
+    if (scene.hasPointerCapture(event.pointerId)) scene.releasePointerCapture(event.pointerId);
+    drag = null;
+  }
+  scene.addEventListener('pointerup', finishDrag);
+  scene.addEventListener('pointercancel', () => { drag = null; scene.classList.remove('is-dragging'); });
+  scene.addEventListener('lostpointercapture', event => {
+    // Touch starts with implicit capture on the card; moving it to the scene must preserve the gesture.
+    if (event.target === scene) { drag = null; scene.classList.remove('is-dragging'); }
+  });
+  // Swipe between full images; zoomed images retain native pan/scroll.
+  let viewerTouch;
+  imageWrap.addEventListener('touchstart', event => {
+    if (!zoomed && event.touches.length === 1) viewerTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }, { passive: true });
+  imageWrap.addEventListener('touchend', event => {
+    if (!viewerTouch || zoomed) return;
+    const dx = event.changedTouches[0].clientX - viewerTouch.x;
+    const dy = event.changedTouches[0].clientY - viewerTouch.y;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5) select(current + (dx < 0 ? 1 : -1));
+    viewerTouch = null;
+  }, { passive: true });
+  imageWrap.addEventListener('touchcancel', () => { viewerTouch = null; }, { passive: true });
+
+  $$('.view-button').forEach(button => button.addEventListener('click', () => {
+    view = button.dataset.view;
+    $$('.view-button').forEach(item => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    scene.hidden = view !== 'deck';
+    grid.hidden = view !== 'grid';
+    $('.gallery-help').hidden = view === 'grid';
+    rail.hidden = view === 'grid';
+    if (view === 'deck') renderDeck();
+  }));
+  window.addEventListener('resize', () => { if (view === 'deck') renderDeck(); });
+  select(0, false);
 }
+initializeGallery();
