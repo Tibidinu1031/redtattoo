@@ -44,6 +44,8 @@ function activateTab(tab, focus = false) {
     item.tabIndex = active ? 0 : -1;
     document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
   }
+  const number = $('.process-big-number');
+  if (number) number.textContent = String(tabs.indexOf(tab) + 1).padStart(2, '0');
   if (focus) tab.focus();
 }
 tabs.forEach((tab, index) => {
@@ -63,6 +65,14 @@ let scheduled = false;
 function updateScroll() {
   const max = document.documentElement.scrollHeight - innerHeight;
   progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
+  const activeSection = ['galerie', 'studio', 'stiluri', 'proces'].map(id => document.getElementById(id))
+    .filter(section => section.getBoundingClientRect().top < innerHeight * 0.4).at(-1);
+  $$('.desktop-nav a').forEach(link => {
+    const active = !!activeSection && link.hash === '#' + activeSection.id && $('#contact').getBoundingClientRect().top > innerHeight * 0.4;
+    link.classList.toggle('is-active', active);
+    if (active) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+  });
   scheduled = false;
 }
 window.addEventListener('scroll', () => {
@@ -154,16 +164,16 @@ function initializeGallery() {
   }
   function renderDeck() {
     const compact = scene.clientWidth < 541;
-    const spacing = compact ? 100 : scene.clientWidth < 900 ? 150 : 205;
+    const spacing = compact ? 104 : scene.clientWidth < 900 ? 148 : 195;
     cards.forEach((card, index) => {
       const d = offset(index);
       const a = Math.abs(d);
       const visible = a <= 3;
       const selected = d === 0;
       card.style.setProperty('--x', d * spacing + 'px');
-      card.style.setProperty('--z', -a * (compact ? 150 : 160) + 'px');
-      card.style.setProperty('--ry', (selected ? -7 : -Math.sign(d) * 39) + 'deg');
-      card.style.setProperty('--rz', (selected ? -3 : -Math.sign(d) * 5) + 'deg');
+      card.style.setProperty('--z', -a * (compact ? 150 : 155) + 'px');
+      card.style.setProperty('--ry', (selected ? 0 : -Math.sign(d) * 36) + 'deg');
+      card.style.setProperty('--rz', (selected ? 0 : -Math.sign(d) * 2) + 'deg');
       card.style.setProperty('--opacity', visible ? 1 : 0);
       card.style.setProperty('--order', String(10 - a));
       card.style.pointerEvents = visible ? 'auto' : 'none';
@@ -200,6 +210,9 @@ function initializeGallery() {
     $('.work-title').textContent = photo.title;
     $('.work-category').textContent = photo.category;
     thumbnails.forEach((button, i) => button.setAttribute('aria-pressed', String(i === current)));
+    const position = $('.gallery-position > span');
+    position.style.width = (100 / photos.length) + '%';
+    position.style.transform = 'translateX(' + (current * 100) + '%)';
     renderDeck();
     if (dialog.open) renderViewer();
     if (announce) {
@@ -208,7 +221,7 @@ function initializeGallery() {
         live.textContent = 'Fotografia ' + (current + 1) + ' din ' + photos.length + ': ' + photo.title;
       }, 120);
       const thumb = thumbnails[current];
-      rail.scrollTo({ left: thumb.offsetLeft - rail.offsetLeft - (rail.clientWidth - thumb.clientWidth) / 2, behavior: reduceMotion.matches ? 'instant' : 'smooth' });
+      rail.scrollTo({ left: rail.scrollLeft + thumb.getBoundingClientRect().left - rail.getBoundingClientRect().left - (rail.clientWidth - thumb.clientWidth) / 2, behavior: reduceMotion.matches ? 'instant' : 'smooth' });
     }
   }
   function openViewer(trigger) {
@@ -273,6 +286,9 @@ function initializeGallery() {
       if (!scene.hasPointerCapture(event.pointerId)) scene.setPointerCapture(event.pointerId);
     }
     drag.dx = dx;
+    if (drag.horizontal && !reduceMotion.matches) {
+      deck.style.setProperty('--drag-x', Math.max(-100, Math.min(100, dx * 0.4)) + 'px');
+    }
   });
   function finishDrag(event) {
     if (!drag || drag.id !== event.pointerId) return;
@@ -281,14 +297,15 @@ function initializeGallery() {
       if (Math.abs(drag.dx) > 42) select(current + (drag.dx < 0 ? 1 : -1));
     }
     scene.classList.remove('is-dragging');
+    deck.style.setProperty('--drag-x', '0px');
     if (scene.hasPointerCapture(event.pointerId)) scene.releasePointerCapture(event.pointerId);
     drag = null;
   }
   scene.addEventListener('pointerup', finishDrag);
-  scene.addEventListener('pointercancel', () => { drag = null; scene.classList.remove('is-dragging'); });
+  scene.addEventListener('pointercancel', () => { drag = null; scene.classList.remove('is-dragging'); deck.style.setProperty('--drag-x', '0px'); });
   scene.addEventListener('lostpointercapture', event => {
     // Touch starts with implicit capture on the card; moving it to the scene must preserve the gesture.
-    if (event.target === scene) { drag = null; scene.classList.remove('is-dragging'); }
+    if (event.target === scene) { drag = null; scene.classList.remove('is-dragging'); deck.style.setProperty('--drag-x', '0px'); }
   });
   // Swipe between full images; zoomed images retain native pan/scroll.
   let viewerTouch;
@@ -317,7 +334,44 @@ function initializeGallery() {
     rail.hidden = view === 'grid';
     if (view === 'deck') renderDeck();
   }));
+  // Only the gallery gets a pointer hint; normal page and keyboard cursors remain intact.
+  const cursor = $('.gallery-cursor');
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let cursorFrame = 0;
+    let cursorX = 0, cursorY = 0;
+    scene.addEventListener('pointermove', event => {
+      if (reduceMotion.matches || event.pointerType === 'touch') return;
+      const bounds = scene.getBoundingClientRect();
+      cursorX = event.clientX - bounds.left;
+      cursorY = event.clientY - bounds.top;
+      scene.classList.add('has-cursor');
+      if (!cursorFrame) cursorFrame = requestAnimationFrame(() => {
+        cursor.style.transform = 'translate(' + cursorX + 'px,' + cursorY + 'px)';
+        cursorFrame = 0;
+      });
+    });
+    scene.addEventListener('pointerleave', () => scene.classList.remove('has-cursor'));
+    scene.addEventListener('focusin', () => scene.classList.remove('has-cursor'));
+    reduceMotion.addEventListener('change', () => scene.classList.remove('has-cursor'));
+  }
   window.addEventListener('resize', () => { if (view === 'deck') renderDeck(); });
   select(0, false);
 }
 initializeGallery();
+
+// Each style reveals a real example from the archive.
+const styleRows = $$('.style-row');
+const styleImages = $$('.style-preview-images img');
+styleRows.forEach((row, index) => {
+  row.addEventListener('toggle', () => {
+    if (!row.open) return;
+    styleImages.forEach((image, imageIndex) => {
+      const active = imageIndex === index;
+      image.classList.toggle('is-active', active);
+      image.setAttribute('aria-hidden', String(!active));
+      if (active) image.loading = 'eager';
+    });
+    $('.style-preview-number').textContent = String(index + 1).padStart(2, '0') + ' / 03';
+    $('.style-preview-title').textContent = $('h3', row).textContent;
+  });
+});
