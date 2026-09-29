@@ -375,3 +375,52 @@ styleRows.forEach((row, index) => {
     $('.style-preview-title').textContent = $('h3', row).textContent;
   });
 });
+
+// Source links and profile photos stay paired with their original authors.
+function initializeReviews() {
+  const reviews = (window.RED_TATTOO_REVIEWS || []).filter(review =>
+    review.rating === 5 && ['name', 'photo', 'text', 'platform', 'source'].every(key => typeof review[key] === 'string' && review[key].trim())
+  ).slice(0, 5);
+  if (!reviews.length) return;
+  const track = $('.reviews-track');
+  const template = $('#review-card-template');
+  for (const review of reviews) {
+    const card = template.content.firstElementChild.cloneNode(true);
+    $('h3', card).textContent = review.name;
+    $('.review-platform', card).textContent = review.platform + (review.excerpt ? ' · fragment' : '');
+    $('blockquote', card).textContent = review.text;
+    $('.review-source', card).href = review.source;
+    const portrait = $('img', card);
+    portrait.src = review.photo;
+    portrait.alt = 'Fotografie de profil: ' + review.name;
+    portrait.addEventListener('error', () => {
+      const initials = review.name.split(/\s+/).slice(0, 2).map(word => word[0]).join('');
+      $('.review-avatar', card).textContent = initials;
+    }, { once: true });
+    track.append(card);
+  }
+  $('.reviews-carousel').hidden = false;
+  const previous = $('.reviews-prev');
+  const next = $('.reviews-next');
+  function updateReviewControls() {
+    previous.disabled = track.scrollLeft < 2;
+    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+  }
+  function moveReview(direction) {
+    const step = track.firstElementChild.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap);
+    track.scrollBy({ left:direction * step, behavior:reduceMotion.matches ? 'instant' : 'smooth' });
+  }
+  previous.addEventListener('click', () => moveReview(-1));
+  next.addEventListener('click', () => moveReview(1));
+  track.addEventListener('keydown', event => {
+    if (event.target !== track || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    moveReview(event.key === 'ArrowRight' ? 1 : -1);
+  });
+  track.addEventListener('scroll', updateReviewControls, { passive:true });
+  window.addEventListener('resize', updateReviewControls);
+  if ('ResizeObserver' in window) new ResizeObserver(updateReviewControls).observe(track);
+  document.fonts.ready.then(updateReviewControls);
+  requestAnimationFrame(updateReviewControls);
+}
+initializeReviews();

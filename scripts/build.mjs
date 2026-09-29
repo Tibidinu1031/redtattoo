@@ -10,9 +10,12 @@ await mkdir(output, { recursive: true });
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const dataScript = await readFile(path.join(root, 'assets/gallery-data.js'), 'utf8');
 const photos = JSON.parse(dataScript.slice(dataScript.indexOf('['), dataScript.lastIndexOf(']') + 1));
+const reviewScript = await readFile(path.join(root, 'assets/reviews-data.js'), 'utf8');
+const reviews = JSON.parse(reviewScript.slice(reviewScript.indexOf('['), reviewScript.lastIndexOf(']') + 1));
 const usedAssets = new Set([
   'assets/gallery-data.js',
   ...photos.map(photo => photo.src),
+  ...reviews.map(review => review.photo).filter(photo => photo.startsWith('assets/')),
   ...[...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(match => match[1])
 ]);
 for (const file of ['index.html', 'styles.css', 'app.js', '.nojekyll', ...usedAssets]) {
@@ -22,4 +25,4 @@ for (const file of ['index.html', 'styles.css', 'app.js', '.nojekyll', ...usedAs
   await mkdir(path.dirname(destination), { recursive: true });
   await copyFile(source, destination);
 }
-console.log('Build: dist/index.html; ' + (usedAssets.size - 1) + ' imagini locale. Sursa rămâne în rădăcină.');
+console.log('Build: dist/index.html; ' + [...usedAssets].filter(file => /\.(?:jpe?g|png|webp|svg)$/i.test(file)).length + ' imagini locale. Sursa rămâne în rădăcină.');

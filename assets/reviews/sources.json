@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Simi",
+    "review": "https://share.google/QLTInNjIQLrPIFpB5",
+    "rating": 5,
+    "photoSource": "https://lh3.googleusercontent.com/a-/ALV-UjUhSBaMsi_7y0eAdhylwJI5OAD3PQT_YprMCytGDChHhEiTeQqu=w112-h112-p-rp-mo-ba12-br100",
+    "photo": "assets/reviews/simi.png",
+    "sha256": "c67d2f6e50400df5c034bc550faf8a8131c3e55990d132d966eea18b87fe6171",
+    "verifiedAt": "2026-09-29",
+    "excerpt": false
+  },
+  {
+    "name": "Marcu Adrian",
+    "review": "https://share.google/4A3qzvtA2y1UgeFt7",
+    "rating": 5,
+    "photoSource": "https://lh3.googleusercontent.com/a-/ALV-UjVNBJY9BxSopCRg5q6kfTBrFUXxood-_pvPTqqiRhfwKd3uaJU=w112-h112-p-rp-mo-ba12-br100",
+    "photo": "assets/reviews/marcu-adrian.png",
+    "sha256": "a3e8d12d5db3257c8527e4cc202b68f962bd867bef99f29b411e8af5f1bf48e8",
+    "verifiedAt": "2026-09-29",
+    "excerpt": false
+  },
+  {
+    "name": "Andreea Andreea",
+    "review": "https://share.google/onMXNjhLGAPq6TE4c",
+    "rating": 5,
+    "photoSource": "https://lh3.googleusercontent.com/a-/ALV-UjVOdOCuDUbDuR05NM2IqPNsmcdU80Ziikf7dkMRh76KDp71qicIzg=w112-h112-p-rp-mo-br100",
+    "photo": "assets/reviews/andreea-andreea.png",
+    "sha256": "b181595032d2e069c1f1a08e408ca68483f6d38c9443ba127a49a9b1e62af8bc",
+    "verifiedAt": "2026-09-29",
+    "excerpt": true
+  },
+  {
+    "name": "Iulia Sălăgeanu",
+    "review": "https://share.google/kZpCi4eVIn8QVDy8Y",
+    "rating": 5,
+    "photoSource": "https://lh3.googleusercontent.com/a-/ALV-UjVB9d6i1l_3fnkKrvHbd8eNaSpuJQCnSt1VzsQotwnKREzT_eQ=w112-h112-p-rp-mo-br100",
+    "photo": "assets/reviews/iulia-salageanu.png",
+    "sha256": "43a8bde748cb54356c4a1355bdaf21c7e95e9a24dd753a1b215b890911222c45",
+    "verifiedAt": "2026-09-29",
+    "excerpt": false
+  },
+  {
+    "name": "Bianca Ganea",
+    "review": "https://share.google/jxqpbyypARSazj3VT",
+    "rating": 5,
+    "photoSource": "https://lh3.googleusercontent.com/a-/ALV-UjVXLYkNM4FXAaNDSN6unQfhfjqLqYFr9LH9i6oL3FGif3S1e1SIzw=w112-h112-p-rp-mo-br100",
+    "photo": "assets/reviews/bianca-ganea.png",
+    "sha256": "00431fe515d0bfcd11f4a6a484a34d31623ab9ce5a234ac51b41720bc5703ba5",
+    "verifiedAt": "2026-09-29",
+    "excerpt": true
+  }
+]

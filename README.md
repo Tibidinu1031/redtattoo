@@ -89,6 +89,14 @@ Alternativ, dezactivează workflow-ul și alege **Deploy from a branch → main 
 
 Linkurile Instagram și Facebook sunt cele furnizate de utilizator. Programările încep printr-o conversație pe paginile salonului; site-ul nu simulează trimiterea unui formular. Textul „Să creem ceva” este păstrat exact conform cererii.
 
-Fonturile DM Sans, Barlow Condensed și Libre Caslon Display se încarcă din Google Fonts, cu fonturi locale de rezervă. Nu există analytics, cookie-uri, date de contact inventate sau stocare locală a vizitatorului.
+Fonturile DM Sans, Barlow Condensed și Libre Caslon Display se încarcă din Google Fonts, cu fonturi locale de rezervă. Site-ul nu adaugă analytics sau stocare locală proprie. Harta încorporată încarcă un serviciu terț Google Maps, care are propriile politici de date și cookie-uri.
 
 Logo-ul original furnizat de utilizator este păstrat fără modificări în `assets/red-tattoo-logo.png`. Emblema completă apare la artist și în subsol; monograma din antet folosește aceeași imagine, încadrată prin CSS. Fotografiile au colțuri discret rotunjite, iar liniile decorative dintre secțiuni sunt eliminate.
+
+## Contact și recenzii
+
+Ordinea noilor secțiuni este: recenzii (`#recenzii`), contact și hartă (`#locatie`), apoi secțiunea originală 05 pentru programări (`#contact`). Adresa **Strada Tilișca nr. 48, bloc 4, Sibiu** a fost confirmată de utilizator. Telefonul **0742 451 134** și pinul au fost verificate pe [Google Maps](https://www.google.com/maps?cid=2253711741192608784) la 29 septembrie 2026. Butonul de telefon folosește `tel:`, iar harta și indicațiile folosesc identificatorul locului pentru a evita confuzia cu vechea adresă de pe Strada Morilor.
+
+Cele cinci recenzii au fost alese prin linkuri Google furnizate de utilizator și verificate la 29 septembrie 2026: Simi, Marcu Adrian, Andreea Andreea, Iulia Sălăgeanu și Bianca Ganea. Fiecare sursă afișează 5 stele. Numele și fotografiile de profil sunt cele publicate de autori. Textele rămân în româna originală, inclusiv formulările autorilor; două recenzii sunt afișate ca fragmente, marcate vizibil, cu link către textul complet.
+
+`assets/reviews-data.js` conține datele, iar `assets/reviews/sources.json` păstrează sursele și proveniența fotografiilor. Componenta afișează cinci carduri cu fotografii locale, stele SVG, nume, text și link către sursă. Navigarea funcționează prin glisare nativă, butoane și tastatură, fără derulare automată. Build-ul include fotografiile referite în date.
