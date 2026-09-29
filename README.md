@@ -4,6 +4,8 @@ Site pentru RED TATTOO by Cristi Nitu. HTML, CSS și JavaScript, fără framewor
 
 Designul folosește un portret amplu în prima secțiune, contrast negru–roșu, compoziții fotografice și tipografie editorială. Navigarea rămâne vizibilă la derulare; stilurile schimbă exemplul foto, iar procesul afișează numărul etapei selectate. Galeria urmărește gestul de tragere, are un indiciu vizual pentru cursor pe desktop. Mișcarea respectă preferința de reducere a animațiilor.
 
+Pe mobil, titlul, portretul și acțiunile din hero au rânduri separate, astfel încât textul să nu acopere artistul. Săgețile din interfață sunt SVG-uri inline, pentru a avea același aspect și în Safari pe iPhone, fără conversie în emoji.
+
 ## Pornire
 
 Deschide `index.html` direct în browser sau, cu Node.js 20+:
