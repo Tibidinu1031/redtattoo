@@ -22,4 +22,4 @@ for (const file of ['index.html', 'styles.css', 'app.js', '.nojekyll', ...usedAs
   await mkdir(path.dirname(destination), { recursive: true });
   await copyFile(source, destination);
 }
-console.log('Build: dist/index.html; ' + (usedAssets.size - 1) + ' fotografii locale. Sursa rămâne în rădăcină.');
+console.log('Build: dist/index.html; ' + (usedAssets.size - 1) + ' imagini locale. Sursa rămâne în rădăcină.');

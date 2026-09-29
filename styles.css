@@ -3347,3 +3347,195 @@ h2 em {
   display:inline-block;
   white-space:nowrap
 }
+
+/* Original studio artwork, supplied by the client. */
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-monogram {
+  display:block;
+  position:relative;
+  width:58px;
+  aspect-ratio:340 / 240;
+  overflow:hidden;
+  flex-shrink:0;
+  mix-blend-mode:screen;
+}
+.logo-monogram img {
+  position:absolute;
+  width:131.18%;
+  max-width:none;
+  height:auto;
+  left:-13.82%;
+  top:-46.67%;
+}
+.brand .brand-caption {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  color:var(--ink);
+  font:500 10px/1.35 var(--body);
+  letter-spacing:1px;
+}
+.brand-caption strong {
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+.brand-emblem {
+  display:block;
+  flex-shrink:0;
+  width:70px;
+  height:auto;
+  border-radius:50%;
+  clip-path:circle(49.4% at 50% 50%);
+}
+.hero-topline {
+  align-items:center;
+  top:21px;
+}
+.hero-studio-brand {
+  display:flex;
+  align-items:center;
+  gap:17px;
+}
+.hero-studio-brand>span {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:12px;
+}
+.hero-studio-brand strong {
+  color:var(--ink);
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+.hero-actions .button,
+.hero-conversation,
+.hero-conversation span {
+  font-weight:700;
+}
+.artist-emblem {
+  width:66px;
+}
+.footer-wordmark {
+  display:flex;
+  align-items:center;
+  gap:25px;
+  letter-spacing:0;
+}
+.footer-emblem {
+  width:140px;
+}
+.footer-wordmark .footer-brand-copy {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin:0;
+  font-family:var(--body);
+  line-height:1.25;
+  letter-spacing:0;
+}
+.footer-brand-copy strong {
+  font:700 clamp(28px,3.5vw,48px)/1 var(--display);
+  letter-spacing:.4px;
+}
+.footer-brand-copy small {
+  font:500 12px/1.5 var(--body);
+  letter-spacing:1.5px;
+  color:var(--muted);
+}
+
+/* Soft corners on the work and artist photographs. */
+.gallery-card,
+.gallery-card img,
+.grid-photo img,
+.studio-print>img,
+.studio-detail img,
+.style-preview-images,
+.style-preview-images img {
+  border-radius:8px;
+}
+.gallery-card {
+  overflow:hidden;
+}
+.studio-detail {
+  border-radius:15px;
+}
+.thumbnail,
+.thumbnail img {
+  border-radius:4px;
+}
+
+/* Spacing supplies the separation; retain outlines only on actual controls. */
+.kicker-line,
+.gallery-position {
+  display:none;
+}
+.site-header,
+.mobile-menu,
+.hero-bottom,
+.gallery-section,
+.gallery-controls,
+.gallery-empty,
+.studio .section-label,
+.artist-signoff,
+.styles-section,
+.style-list,
+.style-row,
+.process-section .section-label,
+.process-index,
+.process-tabs,
+.contact-section .section-label,
+.social-links,
+.social-card,
+.footer-bottom,
+.viewer-top,
+.viewer-bottom {
+  border-top:0;
+  border-bottom:0;
+}
+.text-link,
+.hero-conversation span,
+.open-photo,
+.gallery-credit a,
+.back-top {
+  border-bottom:0;
+}
+.gallery-header .section-kicker {
+  column-gap:24px;
+}
+.style-row summary:hover {
+  background:#ffffff03;
+}
+@media(max-width:760px) {
+  .brand { gap:9px; }
+  .logo-monogram { width:49px; }
+  .brand-caption strong { font-size:12px; }
+  .brand .brand-caption { font-size:9px; letter-spacing:.5px; }
+  .hero-topline>span:last-child { display:none; }
+  .footer-emblem { width:112px; }
+}
+@media(max-width:540px) {
+  .hero-topline { top:17px; }
+  .hero-studio-brand { gap:12px; }
+  .hero-studio-brand .brand-emblem { width:56px; }
+  .hero-studio-brand>span { font-size:11px; letter-spacing:.6px; }
+  .hero-studio-brand strong { font-size:14px; }
+  .footer-emblem { width:86px; }
+  .footer-wordmark { gap:13px; }
+  .footer-brand-copy strong { font-size:28px; }
+  .footer-brand-copy small { font-size:10px; letter-spacing:.7px; }
+  .gallery-header .section-kicker { column-gap:18px; }
+}
+@media(max-width:360px) {
+  .brand .brand-caption { display:none; }
+  .logo-monogram { width:49px; }
+  .footer-emblem { width:72px; }
+  .footer-wordmark { gap:10px; }
+  .footer-brand-copy strong { font-size:24px; }
+  .footer-brand-copy small { font-size:9px; }
+}

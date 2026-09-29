@@ -2,7 +2,7 @@
 
 Site pentru RED TATTOO by Cristi Nitu. HTML, CSS și JavaScript, fără framework sau dependențe de instalat.
 
-Designul folosește un portret amplu în prima secțiune, contrast negru–roșu, compoziții fotografice și tipografie editorială. Navigarea rămâne vizibilă la derulare; stilurile schimbă exemplul foto, iar procesul afișează numărul etapei selectate. Galeria urmărește gestul de tragere, are indicator de poziție și un indiciu vizual pentru cursor pe desktop. Mișcarea respectă preferința de reducere a animațiilor.
+Designul folosește un portret amplu în prima secțiune, contrast negru–roșu, compoziții fotografice și tipografie editorială. Navigarea rămâne vizibilă la derulare; stilurile schimbă exemplul foto, iar procesul afișează numărul etapei selectate. Galeria urmărește gestul de tragere, are un indiciu vizual pentru cursor pe desktop. Mișcarea respectă preferința de reducere a animațiilor.
 
 ## Pornire
 
@@ -87,4 +87,6 @@ Alternativ, dezactivează workflow-ul și alege **Deploy from a branch → main 
 
 Linkurile Instagram și Facebook sunt cele furnizate de utilizator. Programările încep printr-o conversație pe paginile salonului; site-ul nu simulează trimiterea unui formular. Textul „Să creem ceva” este păstrat exact conform cererii.
 
-Fonturile DM Sans, Barlow Condensed, Libre Caslon Display și UnifrakturCook se încarcă din Google Fonts, cu fonturi locale de rezervă. Nu există analytics, cookie-uri, date de contact inventate sau stocare locală a vizitatorului.
+Fonturile DM Sans, Barlow Condensed și Libre Caslon Display se încarcă din Google Fonts, cu fonturi locale de rezervă. Nu există analytics, cookie-uri, date de contact inventate sau stocare locală a vizitatorului.
+
+Logo-ul original furnizat de utilizator este păstrat fără modificări în `assets/red-tattoo-logo.png`. Emblema completă apare în hero, la artist și în subsol; monograma din antet folosește aceeași imagine, încadrată prin CSS. Fotografiile au colțuri discret rotunjite, iar liniile decorative dintre secțiuni sunt eliminate.
