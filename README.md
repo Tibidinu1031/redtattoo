@@ -89,4 +89,4 @@ Linkurile Instagram și Facebook sunt cele furnizate de utilizator. Programăril
 
 Fonturile DM Sans, Barlow Condensed și Libre Caslon Display se încarcă din Google Fonts, cu fonturi locale de rezervă. Nu există analytics, cookie-uri, date de contact inventate sau stocare locală a vizitatorului.
 
-Logo-ul original furnizat de utilizator este păstrat fără modificări în `assets/red-tattoo-logo.png`. Emblema completă apare în hero, la artist și în subsol; monograma din antet folosește aceeași imagine, încadrată prin CSS. Fotografiile au colțuri discret rotunjite, iar liniile decorative dintre secțiuni sunt eliminate.
+Logo-ul original furnizat de utilizator este păstrat fără modificări în `assets/red-tattoo-logo.png`. Emblema completă apare la artist și în subsol; monograma din antet folosește aceeași imagine, încadrată prin CSS. Fotografiile au colțuri discret rotunjite, iar liniile decorative dintre secțiuni sunt eliminate.

@@ -3539,3 +3539,9 @@ h2 em {
   .footer-brand-copy strong { font-size:24px; }
   .footer-brand-copy small { font-size:9px; }
 }
+/* Stronger header actions. */
+.desktop-nav a,
+.header-cta,
+.mobile-menu a {
+  font-weight:700;
+}
